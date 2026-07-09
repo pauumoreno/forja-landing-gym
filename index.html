@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forja — Entrenamiento de fuerza y funcional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal: #1C1B1A;
+    --concrete: #302E2C;
+    --concrete-light: #45423F;
+    --chalk: #EDEAE4;
+    --chalk-dim: #B8B4AC;
+    --iron: #C1440E;
+    --iron-bright: #E8571A;
+    --steel: #4A5A64;
+    --tape: #E8B93A;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--charcoal);
+    color: var(--chalk);
+    font-family: 'Work Sans', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  .display{
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.03em;
+    line-height:0.95;
+    text-transform:uppercase;
+  }
+
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  a{ color:inherit; }
+
+  img{ max-width:100%; display:block; }
+
+  :focus-visible{
+    outline: 3px solid var(--tape);
+    outline-offset: 3px;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ---------- concrete texture background ---------- */
+  .texture{
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.02) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.015) 0%, transparent 45%);
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background: rgba(28,27,26,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 3px solid var(--iron);
+  }
+
+  .nav-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 32px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  .logo{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:1.8rem;
+    letter-spacing:0.08em;
+  }
+  .logo span{ color: var(--iron-bright); }
+
+  nav ul{
+    list-style:none;
+    display:flex;
+    gap:32px;
+  }
+
+  nav a{
+    text-decoration:none;
+    font-weight:600;
+    font-size:0.92rem;
+    letter-spacing:0.02em;
+    color: var(--chalk-dim);
+    transition: color 0.2s;
+  }
+  nav a:hover{ color: var(--chalk); }
+
+  .btn-primary{
+    background: var(--iron);
+    color: var(--chalk);
+    border:none;
+    padding:12px 24px;
+    font-weight:700;
+    font-size:0.9rem;
+    letter-spacing:0.03em;
+    text-decoration:none;
+    display:inline-block;
+    cursor:pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover{ background: var(--iron-bright); transform: translateY(-1px); }
+
+  .btn-ghost{
+    background:transparent;
+    color: var(--chalk);
+    border: 2px solid var(--concrete-light);
+    padding:10px 22px;
+    font-weight:700;
+    font-size:0.9rem;
+    text-decoration:none;
+    display:inline-block;
+    transition: border-color 0.2s;
+  }
+  .btn-ghost:hover{ border-color: var(--chalk-dim); }
+
+  .nav-cta{ display:none; }
+  @media(min-width:720px){ .nav-cta{ display:inline-block; } }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:96px 0 80px;
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap:48px;
+    align-items:center;
+  }
+  @media(max-width:860px){ .hero{ grid-template-columns:1fr; padding:56px 0 48px; } }
+
+  .eyebrow{
+    color: var(--iron-bright);
+    font-weight:700;
+    font-size:0.85rem;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:28px; height:3px;
+    background: var(--iron-bright);
+    display:inline-block;
+  }
+
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 4.6rem);
+    color: var(--chalk);
+  }
+  .hero h1 em{
+    font-style:normal;
+    color: var(--iron-bright);
+  }
+
+  .hero p{
+    margin-top:22px;
+    max-width:46ch;
+    color: var(--chalk-dim);
+    font-size:1.05rem;
+  }
+
+  .hero-ctas{
+    margin-top:32px;
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+
+  /* barbell svg visual */
+  .barbell-box{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .barbell-box svg{ width:100%; height:auto; max-width:420px; }
+  .plate{ transition: transform 0.4s ease; transform-origin: center; }
+  .barbell-box:hover .plate-l1{ transform: translateX(-3px); }
+  .barbell-box:hover .plate-l2{ transform: translateX(-6px); }
+  .barbell-box:hover .plate-r1{ transform: translateX(3px); }
+  .barbell-box:hover .plate-r2{ transform: translateX(6px); }
+
+  /* ---------- stat plates (signature element) ---------- */
+  .stats-section{
+    background: var(--concrete);
+    padding:64px 0;
+    border-top:1px solid var(--concrete-light);
+    border-bottom:1px solid var(--concrete-light);
+  }
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:28px;
+  }
+  @media(max-width:720px){ .stats-grid{ grid-template-columns:1fr; } }
+
+  .stat-plate{
+    background: var(--charcoal);
+    border:2px solid var(--concrete-light);
+    border-radius:50%;
+    aspect-ratio:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+    position:relative;
+  }
+  .stat-plate::before{
+    content:"";
+    position:absolute;
+    inset:14px;
+    border:1px solid var(--concrete-light);
+    border-radius:50%;
+  }
+  .stat-plate .num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:2.2rem;
+    color: var(--tape);
+  }
+  .stat-plate .label{
+    margin-top:8px;
+    font-size:0.8rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color: var(--chalk-dim);
+    max-width:14ch;
+  }
+
+  /* ---------- programs ---------- */
+  .section{ padding:88px 0; }
+
+  .section-head{
+    max-width:60ch;
+    margin-bottom:48px;
+  }
+  .section-head .eyebrow{ color: var(--steel-bright, var(--tape)); }
+  .section-head h2{
+    font-size:clamp(2rem, 4vw, 2.8rem);
+  }
+  .section-head p{ color: var(--chalk-dim); margin-top:14px; }
+
+  .programs-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:24px;
+  }
+  @media(max-width:900px){ .programs-grid{ grid-template-columns:1fr; } }
+
+  .program-card{
+    background: var(--concrete);
+    border:1px solid var(--concrete-light);
+    padding:32px 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .program-card:hover{ border-color: var(--iron); transform: translateY(-4px); }
+
+  .program-card .icon{
+    width:44px; height:44px;
+    color: var(--iron-bright);
+    margin-bottom:20px;
+  }
+
+  .program-card h3{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:1.7rem;
+    letter-spacing:0.03em;
+    margin-bottom:10px;
+  }
+  .program-card p{ color: var(--chalk-dim); font-size:0.95rem; }
+  .program-card .price{
+    margin-top:18px;
+    font-family:'JetBrains Mono', monospace;
+    color: var(--tape);
+    font-weight:700;
+  }
+
+  /* ---------- schedule ---------- */
+  .schedule-section{ background: var(--concrete); }
+
+  .schedule-grid{
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-top:1px solid var(--concrete-light);
+    border-left:1px solid var(--concrete-light);
+  }
+  @media(max-width:860px){ .schedule-grid{ grid-template-columns:1fr 1fr; } }
+
+  .day-col{
+    border-right:1px solid var(--concrete-light);
+    border-bottom:1px solid var(--concrete-light);
+    padding:20px 16px;
+  }
+  .day-col h4{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:1.3rem;
+    letter-spacing:0.05em;
+    color: var(--iron-bright);
+    margin-bottom:12px;
+  }
+  .day-col .slot{
+    font-size:0.85rem;
+    color: var(--chalk-dim);
+    padding:6px 0;
+    border-top:1px dashed rgba(255,255,255,0.08);
+  }
+  .day-col .slot:first-of-type{ border-top:none; }
+
+  /* ---------- about / trainer ---------- */
+  .about-grid{
+    display:grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap:48px;
+    align-items:center;
+  }
+  @media(max-width:800px){ .about-grid{ grid-template-columns:1fr; } }
+
+  .trainer-photo{
+    aspect-ratio:4/5;
+    background: linear-gradient(155deg, var(--concrete-light), var(--concrete));
+    border:1px solid var(--concrete-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .trainer-photo svg{ width:40%; color: var(--concrete-light); }
+
+  .about-copy .eyebrow{ color: var(--tape); }
+  .about-copy h2{ font-size:clamp(1.9rem,3.6vw,2.6rem); margin-bottom:16px; }
+  .about-copy p{ color: var(--chalk-dim); margin-bottom:14px; }
+
+  /* ---------- testimonials ---------- */
+  .testi-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:24px;
+  }
+  @media(max-width:900px){ .testi-grid{ grid-template-columns:1fr; } }
+
+  .testi-card{
+    border-left:3px solid var(--iron);
+    padding:8px 0 8px 22px;
+  }
+  .testi-card p{ color: var(--chalk); font-size:0.98rem; }
+  .testi-card .who{
+    margin-top:14px;
+    font-size:0.85rem;
+    color: var(--chalk-dim);
+    font-weight:600;
+  }
+
+  /* ---------- contact / footer ---------- */
+  .contact-section{
+    background: var(--concrete);
+    border-top: 3px solid var(--iron);
+  }
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:48px;
+  }
+  @media(max-width:800px){ .contact-grid{ grid-template-columns:1fr; } }
+
+  .contact-info h2{ font-size:clamp(1.9rem,3.6vw,2.6rem); margin-bottom:18px; }
+  .contact-info p{ color: var(--chalk-dim); margin-bottom:8px; }
+
+  .contact-info .whatsapp-btn{
+    margin-top:24px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .map-box{
+    aspect-ratio:16/10;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(255,255,255,0.04) 25px),
+      repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(255,255,255,0.04) 25px),
+      var(--charcoal);
+    border:1px solid var(--concrete-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--chalk-dim);
+    font-size:0.85rem;
+    text-align:center;
+    padding:20px;
+  }
+
+  footer{
+    padding:32px 0;
+    text-align:center;
+    color: var(--chalk-dim);
+    font-size:0.85rem;
+    border-top:1px solid var(--concrete-light);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body class="texture">
+
+<header>
+  <div class="nav-inner">
+    <div class="logo">FORJA<span>.</span></div>
+    <nav>
+      <ul>
+        <li><a href="#programas">Programas</a></li>
+        <li><a href="#horarios">Horarios</a></li>
+        <li><a href="#sobre-mi">Sobre mí</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <a href="#contacto" class="btn-primary nav-cta">Reservar clase</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero" style="padding:0; display:contents;">
+    <div>
+      <div class="eyebrow">Fuerza · Funcional · Comunidad</div>
+      <h1 class="display">Tu cuerpo es<br>la herramienta.<br><em>Nosotros el yunque.</em></h1>
+      <p>Entrenamiento de fuerza y funcional en grupos reducidos, con seguimiento real de tu progreso. Sin máquinas de cardio aburridas, sin promesas vacías: solo técnica, disciplina y resultados medibles.</p>
+      <div class="hero-ctas">
+        <a href="#contacto" class="btn-primary">Reserva tu clase gratis</a>
+        <a href="#horarios" class="btn-ghost">Ver horarios</a>
+      </div>
+    </div>
+    <div class="barbell-box">
+      <svg viewBox="0 0 420 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="40" y="72" width="340" height="16" rx="3" fill="#8A8681"/>
+        <g class="plate plate-l2"><rect x="18" y="30" width="22" height="100" rx="4" fill="#45423F" stroke="#5c5854" stroke-width="2"/></g>
+        <g class="plate plate-l1"><rect x="48" y="45" width="18" height="70" rx="4" fill="#C1440E"/></g>
+        <g class="plate plate-r1"><rect x="354" y="45" width="18" height="70" rx="4" fill="#C1440E"/></g>
+        <g class="plate plate-r2"><rect x="380" y="30" width="22" height="100" rx="4" fill="#45423F" stroke="#5c5854" stroke-width="2"/></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="stats-section">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat-plate">
+        <div class="num mono">180+</div>
+        <div class="label">Socios activos entrenando cada semana</div>
+      </div>
+      <div class="stat-plate">
+        <div class="num mono">12.4T</div>
+        <div class="label">Kilos levantados en la última semana</div>
+      </div>
+      <div class="stat-plate">
+        <div class="num mono">06</div>
+        <div class="label">Entrenadores certificados en sala</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="programas">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--tape)">Programas</div>
+      <h2 class="display">Elige tu forma de entrenar</h2>
+      <p>Tres caminos, un mismo criterio: técnica antes que peso, progreso antes que intensidad.</p>
+    </div>
+    <div class="programs-grid">
+      <div class="program-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h2m14 0h2M7 8v8m10-8v8M7 8H5a1 1 0 00-1 1v6a1 1 0 001 1h2m10-8h2a1 1 0 011 1v6a1 1 0 01-1 1h-2"/></svg>
+        <h3>Fuerza</h3>
+        <p>Sentadilla, peso muerto y press de banca. Programación por bloques con progresión de cargas real.</p>
+        <div class="price">Desde $45.000/mes</div>
+      </div>
+      <div class="program-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+        <h3>Funcional</h3>
+        <p>Circuitos de alta exigencia contra reloj. Ideal si buscas resistencia, movilidad y quemar en grupo.</p>
+        <div class="price">Desde $40.000/mes</div>
+      </div>
+      <div class="program-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0112 0v2"/><path d="M18 21v-2a4 4 0 00-3-3.87"/></svg>
+        <h3>Personalizado</h3>
+        <p>Sesiones 1 a 1 con plan a tu medida: lesiones, objetivos de competencia o simple falta de tiempo.</p>
+        <div class="price">Desde $120.000/mes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section schedule-section" id="horarios">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--tape)">Horarios</div>
+      <h2 class="display">La sala abre de lunes a sábado</h2>
+      <p>Clases de 50 minutos. Cupos limitados a 10 personas por sesión.</p>
+    </div>
+    <div class="schedule-grid">
+      <div class="day-col"><h4>Lun</h4><div class="slot">06:30 Fuerza</div><div class="slot">12:00 Funcional</div><div class="slot">18:30 Fuerza</div></div>
+      <div class="day-col"><h4>Mar</h4><div class="slot">07:00 Funcional</div><div class="slot">17:30 Fuerza</div><div class="slot">19:00 Funcional</div></div>
+      <div class="day-col"><h4>Mié</h4><div class="slot">06:30 Fuerza</div><div class="slot">12:00 Funcional</div><div class="slot">18:30 Fuerza</div></div>
+      <div class="day-col"><h4>Jue</h4><div class="slot">07:00 Funcional</div><div class="slot">17:30 Fuerza</div><div class="slot">19:00 Funcional</div></div>
+      <div class="day-col"><h4>Vie</h4><div class="slot">06:30 Fuerza</div><div class="slot">12:00 Funcional</div><div class="slot">18:00 Fuerza</div></div>
+      <div class="day-col"><h4>Sáb</h4><div class="slot">09:00 Funcional</div><div class="slot">10:30 Fuerza</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sobre-mi">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="trainer-photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0112 0v2"/></svg>
+      </div>
+      <div class="about-copy">
+        <div class="eyebrow">Sobre el equipo</div>
+        <h2 class="display">Entrenadores con criterio, no solo con silbato</h2>
+        <p>Fundamos Forja porque nos cansamos de ver rutinas copiadas de internet y máquinas mal usadas. Cada entrenador certificado revisa tu técnica antes de subir el peso, y ajusta tu plan cada 4 semanas según tu progreso real.</p>
+        <p>No prometemos resultados en 30 días. Prometemos que vas a entender por qué haces cada ejercicio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--tape)">Comunidad</div>
+      <h2 class="display">Lo que dice la gente que entrena aquí</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <p>Llevo 8 meses y es la primera vez que entiendo por qué hago cada movimiento, no solo lo copio.</p>
+        <div class="who">— Camila R., socia desde 2025</div>
+      </div>
+      <div class="testi-card">
+        <p>Los grupos pequeños hacen la diferencia. Siempre hay alguien corrigiendo tu postura.</p>
+        <div class="who">— Diego M., programa de Fuerza</div>
+      </div>
+      <div class="testi-card">
+        <p>Volví a entrenar después de una lesión y el plan personalizado me devolvió la confianza.</p>
+        <div class="who">— Valentina S., plan Personalizado</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section contact-section" id="contacto">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="eyebrow" style="color:var(--tape)">Contacto</div>
+        <h2 class="display">Reserva tu primera clase, sin costo</h2>
+        <p>Av. Los Robles 482, local 3</p>
+        <p>Lunes a sábado, 06:00 – 21:00</p>
+        <p>hola@forjagym.cl</p>
+        <a href="#" class="btn-primary whatsapp-btn">Escribir por WhatsApp</a>
+      </div>
+      <div class="map-box">Mapa referencial — reemplazar por ubicación real al publicar</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© 2026 Forja Entrenamiento. Proyecto de portafolio — negocio ficticio con fines demostrativos.</div>
+</footer>
+
+</body>
+</html>
